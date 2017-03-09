@@ -20,27 +20,35 @@
 #pragma config POSCMD=NONE //Primary Oscillator disabled
 #pragma config FWDTEN = OFF // turn off watchdog timer
 
-#define p_min 188
-#define p_max 376
-#define PWM_PERIOD 376
-#define led LATAbits.LATA0 
-#define led2 LATAbits.LATA1
+
+#define redLED LATAbits.LATA0 
+#define blueLED LATAbits.LATA1
 #define buzzer PORTBbits.RB1
 #define switch PORTBbits.RB15
 #define trig1 PORTBbits.RB7
 #define echo1 PORTBbits.RB6
+#define trig2 PORTBbits.RB5
+#define echo2 PORTBbits.RB4
+#define trig3 PORTBbits.RB9
+#define echo3 PORTBbits.RB8
 
-int pulse_width_A1 = 200;
-int pulse_width_A2 = 127;
-int echoTimer;
+typedef int boolean;
+#define true 1
+#define false 0
+int tripped = 0; 
 
-uint16_t soundval;
-uint16_t lightval;
-uint16_t clockInter;
-uint16_t risingEdge=0;
-uint16_t fallingEdge=0;
+char enterPassword[] = "Please enter the password: ";
+char passwordEntered[] = {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '\0'};
+char password[] = "password";
+
+
+int i;
+
+uint16_t soundVal, lightVal, clockInter1, clockInter2,clockInter3,risingEdge1 = 0, fallingEdge1 = 0,risingEdge2 = 0, fallingEdge2= 0,risingEdge3 = 0, fallingEdge3 = 0;
+uint16_t soundValLimit = 100, lightValLimit = 20, proximityLimit = 200;
 int tester = 0;
 char variable= '0';
+
 
 void configIO(void){
         __builtin_write_OSCCONL(OSCCON & 0xbf) ; //clear bit 6 unlock
@@ -49,6 +57,8 @@ void configIO(void){
         RPINR19bits.U2RXR = 10;
         RPOR5bits.RP11R = 5;
         RPINR7bits.IC1R = 6; //Connect IC1 to RP6 (pin 15)
+        RPINR7bits.IC2R = 8;
+        RPINR10bits.IC7R = 4;
         __builtin_write_OSCCONL(OSCCON | 0x40) ; //set bit 6 lock
     }
 
@@ -57,18 +67,12 @@ void configIO(void){
  * defined by the potentiometer
  */
 void _ISR _T2Interrupt(void){ 
-     OC1RS = pulse_width_A1;
      OC2RS = 0;
     _T2IF = 0;    
 }
 
 void initOC12(){
     T2CONbits.TON = 0;
-    PR2 = PWM_PERIOD;
-    OC1RS = p_min;
-    OC1R = p_max;
-    OC2RS = p_min;
-    OC2R = p_max;
     T2CONbits.TCKPS0 = 0;
     T2CONbits.TCKPS1 = 1;
     T2CONbits.TCS = 0;
@@ -92,6 +96,15 @@ void initIC(){
    T3CONbits.TCS = 0;
    PR3 = 0xFFFF;
    T3CONbits.TON = 1;
+   
+   IC2CONbits.ICTMR = 0;
+   IC2CONbits.ICI = 0b00;
+   IC2CONbits.ICM = 0b001;
+   
+   IC7CONbits.ICTMR = 0;
+   IC7CONbits.ICI = 0b00;
+   IC7CONbits.ICM = 0b001;
+   
 }
 
 /*
@@ -102,15 +115,30 @@ void initIC(){
  * to find the count
  */
 void _ISR _IC1Interrupt(void){
-    fallingEdge = risingEdge;
-    risingEdge = IC1BUF;
-    clockInter = risingEdge - fallingEdge;
-    tester++;
+    fallingEdge1 = risingEdge1;
+    risingEdge1 = IC1BUF;
+    clockInter1 = risingEdge1 - fallingEdge1;
     _IC1IF = 0;  
     
      
 }
 
+void _ISR _IC2Interrupt(void){
+    fallingEdge2 = risingEdge2;
+    risingEdge2 = IC2BUF;
+    clockInter2 = risingEdge2 - fallingEdge2;
+    _IC2IF = 0;  
+    
+     
+}
+void _ISR _IC7Interrupt(void){
+    fallingEdge3 = risingEdge3;
+    risingEdge3 = IC7BUF;
+    clockInter3 = risingEdge3 - fallingEdge3;
+    _IC7IF = 0;  
+    
+     
+}
 void sendPulse1(void){
     trig1 = 0;
     trig1 = 1;
@@ -118,69 +146,135 @@ void sendPulse1(void){
     trig1 = 0;
     
 }
+void sendPulse3(void){
+    trig3 = 0;
+    trig3 = 1;
+    __delay_us(10);
+    trig3 = 0;
+    
+}
+void sendPulse2(void){
+    trig2 = 0;
+    trig2 = 1;
+    __delay_us(10);
+    trig2 = 0;
+    
+}
 
 void __attribute__((interrupt,no_auto_psv))U2RXInterrupt(){
     
     variable =(char) U2RXREG & 0x00FF;
     _U2RXIF = 0;
-    
+    tester ++;
 }
 
-
-
-
 void alarmOn(void){
-    char lock[25];
-    int passcode = 0;
-    led = ~led;
-    __delay_ms(150);
-    led2 = ~led2;
+    putsU2("The alarm has been tripped!");
+    putU2('\n');
+    putU2('\r');
+    tripped = true;
     
-    while(passcode == 0){
-        variable = getU2();
-        putU2(variable);
-        if(variable == ('p')){
-            variable = getU2();
-            putU2(variable);
-            if(variable == ('a')){
-                variable = getU2();
-                putU2(variable);
-                if(variable == ('s')){
-                    variable = getU2();
-                    putU2(variable);
-                    if(variable == ('s')){
-                        variable = getU2();
-                        putU2(variable);
-                        if(variable == ('w')){
-                            variable = getU2();
-                            putU2(variable);
-                            if(variable == ('o')){
-                                variable = getU2();
-                                putU2(variable);
-                                if(variable == ('r')){
-                                    variable = getU2();
-                                    putU2(variable);
-                                    if(variable == ('d')){
-                                        passcode = 1;
-                                        sprintf(lock, "The alarm has been disarmed");
-                                        putsU2(lock);
+    while(tripped == true){
+        i = 0;
+        putsU2(enterPassword);
+        blueLED = ~blueLED;
+        __delay_ms(150);
+        redLED = ~redLED;
+
+        while (i < 8){
+            while(!U2STAbits.URXDA){
+                blueLED = ~blueLED;
+                __delay_ms(150);
+                redLED = ~redLED;
+            }
+            passwordEntered[i] = getU2();
+            putU2(passwordEntered[i]);
+            i++;
+            blueLED = ~blueLED;
+            __delay_ms(150);
+            redLED = ~redLED;
+        }
+        putU2('\n');
+        putU2('\r');
+        if (passwordEntered[0] == password[0]){
+            blueLED = ~blueLED;
+            __delay_ms(150);
+            redLED = ~redLED;
+            if (passwordEntered[1] == password[1]){
+                blueLED = ~blueLED;
+                __delay_ms(150);
+                redLED = ~redLED;
+                if (passwordEntered[2] == password[2]){
+                     blueLED = ~blueLED;
+                    __delay_ms(150);
+                     redLED = ~redLED;
+                    if (passwordEntered[3] == password[3]){
+                        blueLED = ~blueLED;
+                        __delay_ms(150);
+                        redLED = ~redLED;
+                        if (passwordEntered[4] == password[4]){
+                            blueLED = ~blueLED;
+                            __delay_ms(150);
+                            redLED = ~redLED;
+                            if (passwordEntered[5] == password[5]){
+                                blueLED = ~blueLED;
+                                __delay_ms(150);
+                                redLED = ~redLED;
+                                if (passwordEntered[6] == password[6]){
+                                     blueLED = ~blueLED;
+                                     __delay_ms(150);
+                                     redLED = ~redLED;
+                                    if (passwordEntered[7] == password[7]){
+                                        putsU2("Password Accepted! The alarm will now be disarmed");
+                                        tripped = 0;
+                                        blueLED = 0; 
+                                        redLED = 0;
+                                    }
                                 }
                             }
                         }
                     }
                 }
             }
-
-
+        }
+        else{
+            blueLED = ~blueLED;
+            __delay_ms(150);
+            redLED = ~redLED;
+            putsU2("Incorrect Password. Please try again");
+            putU2('\n');
+            putU2('\r');
+            blueLED = ~blueLED;
+            __delay_ms(150);
+            redLED = ~redLED;
         }
     }
-    
+
+
+}
+
+
+
+
+
+
+void blinkLEDs(){
+    int count = 0;
+    while (1){
+        if(redLED == 0){
+            blueLED = ~blueLED;
+        }
+        if (blueLED == 0){
+            redLED = ~redLED;
+        }
+       count++;
+        __delay_ms(150);
+
     }
 }
 
-/*
- *  
- */
+
+
 int main(void) {
     
     configIO();
@@ -192,59 +286,101 @@ int main(void) {
     TRISA = 0x0000;
     TRISB = 0x0000;
     LATA = 0x0000;
-    TRISAbits.TRISA0 = 0; //led
-    TRISAbits.TRISA1 = 0; //led
-    TRISBbits.TRISB1 = 0; //buzzer
-    TRISBbits.TRISB15 = 1; // switch is input
-    TRISBbits.TRISB6 = 1; //echo is an input
-    TRISBbits.TRISB7 = 0; //trig is output
     _IC1IF = 0;
     _IC1IE = 1;
+    _IC2IE = 1;
+    _IC2IF = 0;
+    _IC7IF = 0;
+    _IC7IE = 1;
     _T2IF = 0;
     _T2IE = 1; 
-    
-    
+//    alarmOn();
+    TRISAbits.TRISA0 = 0; //led
+    TRISAbits.TRISA1 = 0; //led
+    TRISBbits.TRISB15 = 1; // switch is input
     char testTT[25];
     char stringLight[100];
     char stringSound[100];
     char ping[25];
+    
     while(1){
-        sendPulse1();
-        sendPulse1();
-        sendPulse1();
+//        if (switch == 0){
+//            putsU2("Alarm is Disabled.");
+//            blueLED = 0;
+//            redLED = 0;
+//        }
+//        else {
+//          TRISBbits.TRISB1 = 0; //buzzer
+            TRISBbits.TRISB6 = 1; //echo is an input
+            TRISBbits.TRISB7 = 0; //trig is output
+            TRISBbits.TRISB4 = 1; 
+            TRISBbits.TRISB5 = 0;
+            TRISBbits.TRISB8 = 1;
+            TRISBbits.TRISB9 = 0;
+       //     putsU2("Alarm is Enabled!");
+            sendPulse1();
+            sendPulse2();
+            sendPulse3();           
+            initADC(11);
+            lightVal = readADC(11);
+            initADC(10);
+            soundVal = readADC(10);
+       // }
 
-        led = ~led;
-        __delay_ms(1000);
-        led2 = ~led2;
-        initADC(11);
-        lightval = readADC(11);
-        sprintf(stringLight, "light sensor %i " ,lightval);
+        
+        sprintf(stringLight, "Light: %i" ,lightVal);
         putsU2(stringLight);
         putU2('\n');
-        
+        putU2('\n');
+//        
+//
 
-        initADC(10);
-        soundval = averagevalue(10);
-        sprintf(stringSound,"sound sensor %i", soundval);
+        sprintf(stringSound,"Sound: %i", soundVal);
         putsU2(stringSound);
+        putU2('\n');
         putU2('\n');
         
                 
         
-        __delay_ms(200);
-        sprintf(ping,"time %i %i %i", clockInter, risingEdge, fallingEdge);
+        sprintf(ping,"Prox1: %i, Prox2: %i, Prox3: %i", clockInter1, clockInter2, clockInter3);
         putsU2(ping);
         putU2('\n');
-        
-        
-        sprintf(testTT,"IC interrupts %i", tester);
-        putsU2(testTT);
         putU2('\n');
-     //   buzzer = 1;
+//        
+//        
+//        sprintf(testTT,"IC interrupts %i", tester);
+//        putsU2(testTT);
+//        putU2('\n');
+//        putU2('\n');
         
-        
+//        if(soundVal > soundValLimit){
+//            putsU2("I checked Sound!");
+//            putU2('\n');
+//            putU2('\n');
+//            alarmOn();
+//            
+//        }
+//        else if (lightVal > lightValLimit){
+//            putsU2("I checked Light!");
+//            putU2('\n');
+//            putU2('\n');
+//            alarmOn();
+//        }
+//        else if (clockInter1 > 0 || clockInter2 > 0 || clockInter3 > 0){
+//                if (clockInter1 < proximityLimit || clockInter2 < proximityLimit || clockInter3 < proximityLimit){
+//                    putsU2("I checked Proximity");
+//                    putU2('\n');
+//                    putU2('\n');
+//                    alarmOn();
+//                }
+//        }
+        __delay_ms(10000);
+//     //   buzzer = 1;
+//        
+//        
         
     
         
-    }  
+ //   }  
+    }
 }
