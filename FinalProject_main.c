@@ -11,7 +11,7 @@
 #include <stdlib.h>
 #include "p24hxxxx.h"	
 #include <libpic30.h>
-#include "ser_2.h"
+#include "ser.h"
 #include "adc.h"
 
 #pragma config FNOSC=FRC // set oscillator mode for FRC ~ 8 Mhz
@@ -37,7 +37,10 @@ int echoTimer;
 uint16_t soundval;
 uint16_t lightval;
 uint16_t clockInter;
+uint16_t risingEdge=0;
+uint16_t fallingEdge=0;
 
+char variable= '0';
 
 void configIO(void){
         __builtin_write_OSCCONL(OSCCON & 0xbf) ; //clear bit 6 unlock
@@ -85,7 +88,7 @@ void initIC(){
    IC1CONbits.ICI = 0b00;
    IC1CONbits.ICM = 0b001;
    T3CONbits.TCKPS0 = 0;
-   T3CONbits.TCKPS1 = 0;
+   T3CONbits.TCKPS1 = 1;
    T3CONbits.TCS = 0;
    PR3 = 0xFFFF;
    T3CONbits.TON = 1;
@@ -99,9 +102,11 @@ void initIC(){
  * to find the count
  */
 void _ISR _IC1Interrupt(void){
-    clockInter = IC1BUF;
+    fallingEdge = risingEdge;
+    risingEdge = IC1BUF;
+    clockInter = risingEdge - fallingEdge;
+
     _IC1IF = 0;  
-    
     
      
 }
@@ -112,11 +117,69 @@ void sendPulse1(void){
     trig1 = 0;
     
 }
+
+void __attribute__((interrupt,no_auto_psv))U2RXInterrupt(){
+    
+    variable =(char) U2RXREG & 0x00FF;
+    _U2RXIF = 0;
+    
+}
+
 uint16_t readDistance1(void){
     uint16_t time = 0;
     while(1){
         sendPulse1();
         
+    }
+}
+
+
+void alarmOn(void){
+    char lock[25];
+    int passcode = 0;
+    led = ~led;
+    __delay_ms(150);
+    led2 = ~led2;
+    
+    while(passcode == 0){
+        variable = getU2();
+        putU2(variable);
+        if(variable == ('p')){
+            variable = getU2();
+            putU2(variable);
+            if(variable == ('a')){
+                variable = getU2();
+                putU2(variable);
+                if(variable == ('s')){
+                    variable = getU2();
+                    putU2(variable);
+                    if(variable == ('s')){
+                        variable = getU2();
+                        putU2(variable);
+                        if(variable == ('w')){
+                            variable = getU2();
+                            putU2(variable);
+                            if(variable == ('o')){
+                                variable = getU2();
+                                putU2(variable);
+                                if(variable == ('r')){
+                                    variable = getU2();
+                                    putU2(variable);
+                                    if(variable == ('d')){
+                                        passcode = 1;
+                                        sprintf(lock, "The alarm has been disarmed");
+                                        putsU2(lock);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+
+        }
+    }
+    
     }
 }
 
@@ -168,7 +231,18 @@ int main(void) {
         putsU2(stringSound);
         putU2('\n');
         
+                _IC1IE = 1; 
+        sendPulse1();
+        __delay_ms(200);
         sprintf(ping,"time %i", clockInter);
+        putsU2(ping);
+        putU2('\n');
+        while(1){
+            char test = getU2();
+            putU2(test);
+            break;
+            }
+        alarmOn();
      //   buzzer = 1;
         
         
