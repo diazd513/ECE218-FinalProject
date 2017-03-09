@@ -86,13 +86,13 @@ Program Memory  [Origin = 0x200, Length = 0x15600]
 section                    address   length (PC units)   length (bytes) (dec)
 -------                    -------   -----------------   --------------------
 .text                        0x200               0xaba          0x1017  (4119)
-.const                       0xcba                0xa8            0xfc  (252)
-.text                        0xd62               0x770           0xb28  (2856)
-.dinit                      0x14d2                0x76            0xb1  (177)
-.text                       0x1548                0x5c            0x8a  (138)
-.init.delay32               0x15a4                0x1c            0x2a  (42)
+.const                       0xcba               0x102           0x183  (387)
+.text                        0xdbc               0x7fe           0xbfd  (3069)
+.dinit                      0x15ba                0x76            0xb1  (177)
+.text                       0x1630                0x5c            0x8a  (138)
+.init.delay32               0x168c                0x1c            0x2a  (42)
 
-                 Total program memory used (bytes):         0x1da0  (7584) 5%
+                 Total program memory used (bytes):         0x1efc  (7932) 6%
 
 
 Ivt Memory  [Origin = 0x4, Length = 0xfc]
@@ -210,45 +210,45 @@ External Symbols in Program Memory (by address):
                   0x000bf6                  ___umoddi3
                   0x000bfe                  ___divdi3
                   0x000c5e                  ___moddi3
-                  0x000d62                  _configIO
-                  0x000dd6                  __T2Interrupt
-                  0x000dec                  _initOC12
-                  0x000e14                  _initIC
-                  0x000e64                  __IC1Interrupt
-                  0x000e88                  __IC2Interrupt
-                  0x000eac                  __IC7Interrupt
-                  0x000ed0                  _sendPulse1
-                  0x000ee2                  _sendPulse3
-                  0x000ef4                  _sendPulse2
-                  0x000f06                  _U2RXInterrupt
-                  0x000f1e                  _alarmOn
-                  0x001260                  _blinkLEDs
-                  0x0012ae                  _main
-                  0x001364                  _readADC
-                  0x00137e                  _initADC
-                  0x00139c                  _mask_translate
-                  0x00140e                  _binary_to_ASCIIconvert
-                  0x001492                  _averagevalue
-                  0x001548                  _initUART2
-                  0x001556                  _putU2
-                  0x00156e                  _getU2
-                  0x001582                  _putsU2
-                  0x0015a4                  ___delay32
+                  0x000dbc                  _configIO
+                  0x000e30                  __T2Interrupt
+                  0x000e46                  _initOC12
+                  0x000e6e                  _initIC
+                  0x000ebe                  __IC1Interrupt
+                  0x000ee2                  __IC2Interrupt
+                  0x000f06                  __IC7Interrupt
+                  0x000f2a                  _sendPulse1
+                  0x000f3c                  _sendPulse3
+                  0x000f4e                  _sendPulse2
+                  0x000f60                  _U2RXInterrupt
+                  0x000f78                  _alarmOn
+                  0x0012bc                  _blinkLEDs
+                  0x001314                  _main
+                  0x00144c                  _readADC
+                  0x001466                  _initADC
+                  0x001484                  _mask_translate
+                  0x0014f6                  _binary_to_ASCIIconvert
+                  0x00157a                  _averagevalue
+                  0x001630                  _initUART2
+                  0x00163e                  _putU2
+                  0x001656                  _getU2
+                  0x00166a                  _putsU2
+                  0x00168c                  ___delay32
 
 External Symbols in Program Memory (by name):
 
-                  0x000f06                  _U2RXInterrupt
+                  0x000f60                  _U2RXInterrupt
                   0x0002cc                  __DefaultInterrupt
-                  0x000e64                  __IC1Interrupt
-                  0x000e88                  __IC2Interrupt
-                  0x000eac                  __IC7Interrupt
+                  0x000ebe                  __IC1Interrupt
+                  0x000ee2                  __IC2Interrupt
+                  0x000f06                  __IC7Interrupt
                   0x000698                  __Litob
                   0x0008f6                  __Puttxt
-                  0x000dd6                  __T2Interrupt
+                  0x000e30                  __T2Interrupt
                   0x000a6e                  __Vacopy
                   0x0002fe                  ___Printf_cdnopuxX
                   0x000462                  ___Putfld_cdnopuxX
-                  0x0015a4                  ___delay32
+                  0x00168c                  ___delay32
                   0x000bfe                  ___divdi3
                   0x000a72                  ___divsi3
                   0x000c5e                  ___moddi3
@@ -262,25 +262,25 @@ External Symbols in Program Memory (by name):
                   0x00023c                  __psv_init
                   0x000200                  __resetPRI
                   0x0002e0                  __sprintf_cdnopuxX
-                  0x000f1e                  _alarmOn
-                  0x001492                  _averagevalue
-                  0x00140e                  _binary_to_ASCIIconvert
-                  0x001260                  _blinkLEDs
-                  0x000d62                  _configIO
-                  0x00156e                  _getU2
-                  0x00137e                  _initADC
-                  0x000e14                  _initIC
-                  0x000dec                  _initOC12
-                  0x001548                  _initUART2
-                  0x0012ae                  _main
-                  0x00139c                  _mask_translate
+                  0x000f78                  _alarmOn
+                  0x00157a                  _averagevalue
+                  0x0014f6                  _binary_to_ASCIIconvert
+                  0x0012bc                  _blinkLEDs
+                  0x000dbc                  _configIO
+                  0x001656                  _getU2
+                  0x001466                  _initADC
+                  0x000e6e                  _initIC
+                  0x000e46                  _initOC12
+                  0x001630                  _initUART2
+                  0x001314                  _main
+                  0x001484                  _mask_translate
                   0x000672                  _memcpy
-                  0x001556                  _putU2
-                  0x001582                  _putsU2
-                  0x001364                  _readADC
-                  0x000ed0                  _sendPulse1
-                  0x000ef4                  _sendPulse2
-                  0x000ee2                  _sendPulse3
+                  0x00163e                  _putU2
+                  0x00166a                  _putsU2
+                  0x00144c                  _readADC
+                  0x000f2a                  _sendPulse1
+                  0x000f4e                  _sendPulse2
+                  0x000f3c                  _sendPulse3
                   0x000680                  _strchr
                   0x0002d2                  sprintf_cdnopuxX.XXeo:_prout
 
@@ -454,11 +454,11 @@ __FUID3
 .comment
  *(.comment)
 
-.debug_info       0x000000       0x2d73
+.debug_info       0x000000       0x2d1d
  *(.debug_info)
  .debug_info      0x000000        0x533 build/default/production/adc.o
  .debug_info      0x000533        0x515 build/default/production/ser.o
- .debug_info      0x000a48       0x232b build/default/production/FinalProject_main.o
+ .debug_info      0x000a48       0x22d5 build/default/production/FinalProject_main.o
  *(.gnu.linkonce.wi.*)
 
 .debug_abbrev     0x000000        0x3f3
@@ -467,11 +467,11 @@ __FUID3
  .debug_abbrev    0x000144         0xfe build/default/production/ser.o
  .debug_abbrev    0x000242        0x1b1 build/default/production/FinalProject_main.o
 
-.debug_line       0x000000        0x373
+.debug_line       0x000000        0x38c
  *(.debug_line)
  .debug_line      0x000000         0xdd build/default/production/adc.o
  .debug_line      0x0000dd         0xa3 build/default/production/ser.o
- .debug_line      0x000180        0x1f3 build/default/production/FinalProject_main.o
+ .debug_line      0x000180        0x20c build/default/production/FinalProject_main.o
 
 .debug_frame      0x000000        0x322
  *(.debug_frame)
@@ -479,11 +479,11 @@ __FUID3
  .debug_frame     0x0000a0         0x84 build/default/production/ser.o
  .debug_frame     0x000124        0x1fe build/default/production/FinalProject_main.o
 
-.debug_str        0x000000        0x1e3
+.debug_str        0x000000        0x20e
  *(.debug_str)
  .debug_str       0x000000         0x36 build/default/production/adc.o
  .debug_str       0x000036         0x15 build/default/production/ser.o
- .debug_str       0x00004b        0x198 build/default/production/FinalProject_main.o
+ .debug_str       0x00004b        0x1c3 build/default/production/FinalProject_main.o
 
 .debug_loc
  *(.debug_loc)
@@ -1503,42 +1503,42 @@ __c30_signature
  .ivt._IC7Interrupt
                   0x000040          0x2 build/default/production/FinalProject_main.o
 
-.const              0x8cba         0xa8 load address 0x000cba  
- .const             0x8cba         0xa8 build/default/production/FinalProject_main.o
+.const              0x8cba        0x102 load address 0x000cba  
+ .const             0x8cba        0x102 build/default/production/FinalProject_main.o
 
-.text             0x000d62        0x770
- .text            0x000d62        0x602 build/default/production/FinalProject_main.o
-                  0x000d62                  _configIO
-                  0x000dd6                  __T2Interrupt
-                  0x000dec                  _initOC12
-                  0x000e14                  _initIC
-                  0x000e64                  __IC1Interrupt
-                  0x000e88                  __IC2Interrupt
-                  0x000eac                  __IC7Interrupt
-                  0x000ed0                  _sendPulse1
-                  0x000ee2                  _sendPulse3
-                  0x000ef4                  _sendPulse2
-                  0x000f06                  _U2RXInterrupt
-                  0x000f1e                  _alarmOn
-                  0x001260                  _blinkLEDs
-                  0x0012ae                  _main
- .text            0x001364        0x16e build/default/production/adc.o
-                  0x001364                  _readADC
-                  0x00137e                  _initADC
-                  0x00139c                  _mask_translate
-                  0x00140e                  _binary_to_ASCIIconvert
-                  0x001492                  _averagevalue
+.text             0x000dbc        0x7fe
+ .text            0x000dbc        0x690 build/default/production/FinalProject_main.o
+                  0x000dbc                  _configIO
+                  0x000e30                  __T2Interrupt
+                  0x000e46                  _initOC12
+                  0x000e6e                  _initIC
+                  0x000ebe                  __IC1Interrupt
+                  0x000ee2                  __IC2Interrupt
+                  0x000f06                  __IC7Interrupt
+                  0x000f2a                  _sendPulse1
+                  0x000f3c                  _sendPulse3
+                  0x000f4e                  _sendPulse2
+                  0x000f60                  _U2RXInterrupt
+                  0x000f78                  _alarmOn
+                  0x0012bc                  _blinkLEDs
+                  0x001314                  _main
+ .text            0x00144c        0x16e build/default/production/adc.o
+                  0x00144c                  _readADC
+                  0x001466                  _initADC
+                  0x001484                  _mask_translate
+                  0x0014f6                  _binary_to_ASCIIconvert
+                  0x00157a                  _averagevalue
 
-.dinit            0x0014d2         0x76
- .dinit           0x0014d2         0x76 data_init
+.dinit            0x0015ba         0x76
+ .dinit           0x0015ba         0x76 data_init
 
-.text             0x001548         0x5c
- .text            0x001548         0x5c build/default/production/ser.o
-                  0x001548                  _initUART2
-                  0x001556                  _putU2
-                  0x00156e                  _getU2
-                  0x001582                  _putsU2
+.text             0x001630         0x5c
+ .text            0x001630         0x5c build/default/production/ser.o
+                  0x001630                  _initUART2
+                  0x00163e                  _putU2
+                  0x001656                  _getU2
+                  0x00166a                  _putsU2
 
-.init.delay32     0x0015a4         0x1c
- .init.delay32    0x0015a4         0x1c c:/program files (x86)/microchip/xc16/v1.30/bin/bin/../../lib\liblega-pic30-elf.a(delay32.Leo)
-                  0x0015a4                  ___delay32
+.init.delay32     0x00168c         0x1c
+ .init.delay32    0x00168c         0x1c c:/program files (x86)/microchip/xc16/v1.30/bin/bin/../../lib\liblega-pic30-elf.a(delay32.Leo)
+                  0x00168c                  ___delay32
