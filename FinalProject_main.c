@@ -39,7 +39,7 @@ uint16_t lightval;
 uint16_t clockInter;
 uint16_t risingEdge=0;
 uint16_t fallingEdge=0;
-
+int tester = 0;
 char variable= '0';
 
 void configIO(void){
@@ -105,15 +105,16 @@ void _ISR _IC1Interrupt(void){
     fallingEdge = risingEdge;
     risingEdge = IC1BUF;
     clockInter = risingEdge - fallingEdge;
-
+    tester++;
     _IC1IF = 0;  
     
      
 }
 
 void sendPulse1(void){
+    trig1 = 0;
     trig1 = 1;
-    __delay_ms(0.01);
+    __delay_us(10);
     trig1 = 0;
     
 }
@@ -125,13 +126,7 @@ void __attribute__((interrupt,no_auto_psv))U2RXInterrupt(){
     
 }
 
-uint16_t readDistance1(void){
-    uint16_t time = 0;
-    while(1){
-        sendPulse1();
-        
-    }
-}
+
 
 
 void alarmOn(void){
@@ -204,17 +199,20 @@ int main(void) {
     TRISBbits.TRISB6 = 1; //echo is an input
     TRISBbits.TRISB7 = 0; //trig is output
     _IC1IF = 0;
-    _IC1IE = 1; 
+    _IC1IE = 1;
     _T2IF = 0;
     _T2IE = 1; 
     
     
- 
+    char testTT[25];
     char stringLight[100];
     char stringSound[100];
     char ping[25];
     while(1){
-        
+        sendPulse1();
+        sendPulse1();
+        sendPulse1();
+
         led = ~led;
         __delay_ms(1000);
         led2 = ~led2;
@@ -231,23 +229,22 @@ int main(void) {
         putsU2(stringSound);
         putU2('\n');
         
-                _IC1IE = 1; 
-        sendPulse1();
+                
+        
         __delay_ms(200);
-        sprintf(ping,"time %i", clockInter);
+        sprintf(ping,"time %i %i %i", clockInter, risingEdge, fallingEdge);
         putsU2(ping);
         putU2('\n');
-        while(1){
-            char test = getU2();
-            putU2(test);
-            break;
-            }
-        alarmOn();
+        
+        
+        sprintf(testTT,"IC interrupts %i", tester);
+        putsU2(testTT);
+        putU2('\n');
      //   buzzer = 1;
         
         
         
-    }
-            
     
+        
+    }  
 }
